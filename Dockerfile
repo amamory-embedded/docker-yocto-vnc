@@ -104,7 +104,7 @@ BBLAYERS += \" \\ \n\
 RUN figlet "conf/bblayers.conf"
 RUN cd /home/${USER}/template/build && cat conf/bblayers.conf
 
-# add usefull commands for the docker user
+# add usefull commands for the docker user 
 RUN echo -e "\
 alias find_images=\"find /opt/yocto/dunfell/src/ -type f -path '*images/*' -name '*.bb'\" \n\
 echo -e \"Run: source ${YOCTO_SRC_PATH}/poky/oe-init-build-env\" \n\
