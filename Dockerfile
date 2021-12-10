@@ -29,55 +29,86 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 # Replace dash with bash
 RUN rm /bin/sh && ln -s /bin/bash /bin/sh
 
+# Set the username
+ENV USER build
+
 # User management
-RUN groupadd -g 1000 build && useradd -u 1000 -g 1000 -ms /bin/bash build && usermod -a -G sudo build && usermod -a -G users build
+RUN groupadd -g 1000 ${USER} && useradd -u 1000 -g 1000 -ms /bin/bash ${USER} && usermod -a -G sudo ${USER} && usermod -a -G users ${USER}
+RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
 # Install repo
 RUN curl -o /usr/local/bin/repo https://storage.googleapis.com/git-repo-downloads/repo && chmod a+x /usr/local/bin/repo
 
-# Run as build user from the installation path
-ENV YOCTO_INSTALL_PATH "/opt/yocto"
-RUN install -o 1000 -g 1000 -d $YOCTO_INSTALL_PATH
-RUN export USER=build
-USER ${USER}
-WORKDIR ${YOCTO_INSTALL_PATH}
-RUN cp /etc/skel/.bashrc /home/${USER}
-
 # Set the Yocto release
 ENV YOCTO_RELEASE "dunfell"
+# Run as build user from the installation path
+ENV YOCTO_PATH "/opt/yocto/${YOCTO_RELEASE}"
+ENV YOCTO_SRC_PATH "${YOCTO_PATH}/src"
+RUN mkdir -p ${YOCTO_SRC_PATH}
+RUN chown -R build /opt/yocto
+#RUN install -o 1000 -g 1000 -d $YOCTO_BASE_PATH
+RUN cp /etc/skel/.bashrc /home/${USER}
+# mounting place for sstate, cache and downloads. Usefull for incremental Linux design
+RUN mkdir -p /mnt/yocto && chmod 777 /mnt/yocto
+
+USER ${USER}
 
 # Install Poky 
-RUN cd ${YOCTO_INSTALL_PATH} && git clone --branch ${YOCTO_RELEASE} https://git.yoctoproject.org/poky
+RUN cd ${YOCTO_SRC_PATH} && git clone --branch ${YOCTO_RELEASE} https://git.yoctoproject.org/poky
 
 # Install raspberry support and required layers
-RUN cd ${YOCTO_INSTALL_PATH}/poky && git clone --branch ${YOCTO_RELEASE} https://git.yoctoproject.org/meta-raspberrypi 
-RUN cd ${YOCTO_INSTALL_PATH}/poky && git clone --branch ${YOCTO_RELEASE} https://git.openembedded.org/meta-openembedded
-ENV USER build
-ENV YOCTO_PATH ${YOCTO_INSTALL_PATH}
-ENV YOCTO_RELEASE ${YOCTO_RELEASE}
-RUN mkdir -p /home/${USER}/rpi/build
-RUN source ${YOCTO_PATH}/poky/oe-init-build-env /home/${USER}/rpi/build
-RUN tree /home/${USER}/rpi/build
+RUN cd ${YOCTO_SRC_PATH} && git clone --branch ${YOCTO_RELEASE} https://git.yoctoproject.org/meta-raspberrypi 
+RUN cd ${YOCTO_SRC_PATH} && git clone --branch ${YOCTO_RELEASE} https://git.openembedded.org/meta-openembedded
+# add here any other layer to be used
 
-# set the target machine in conf/local.conf
-RUN cd /home/${USER}/rpi/build && echo -e 'MACHINE = "raspberrypi3"' >> conf/local.conf
-RUN cd /home/${USER}/rpi/build && echo -e 'CORE_IMAGE_EXTRA_INSTALL += "openssh"' >> conf/local.conf
+# mounting place with the host, where the image is created
+RUN mkdir -p /home/${USER}/rpi/
+
+# building the template project
+RUN mkdir -p /home/${USER}/template/build
+RUN source ${YOCTO_SRC_PATH}/poky/oe-init-build-env /home/${USER}/template/build
+RUN tree /home/${USER}/template/build
+
+# set the target machine, cache dir, and desired tools in conf/local.conf
+# How to add apt-get https://imxdev.gitlab.io/tutorial/How_to_apt-get_to_the_Yocto_Project_image/
+RUN cd /home/${USER}/template/build && echo -e "\
+MACHINE = \"raspberrypi3\" \n\
+CORE_IMAGE_EXTRA_INSTALL += \"openssh\" \n\
+IMAGE_INSTALL_append += \" nano\" \n\ 
+IMAGE_INSTALL_append += \" htop\" \n\ 
+IMAGE_INSTALL_append += \" apt\" \n\ 
+PACKAGE_CLASSES = \"package_deb\" \n\ 
+PACKAGE_FEED_URIS = \"http://localhost:5678\" \n\ 
+EXTRA_IMAGE_FEATURES += \" package-management \" \n\ 
+SSTATE_DIR = \"/mnt/yocto/shared-sstate-cache\" \n\
+DL_DIR = \"/mnt/yocto/downloads\" \n\
+TMPDIR = \"/mnt/yocto/tmp\" \n\
+  " >> conf/local.conf
 RUN figlet "conf/local.conf"
-RUN cd /home/${USER}/rpi/build && cat conf/local.conf
+RUN cd /home/${USER}/template/build && cat conf/local.conf
+
+# Some extra parameters that might interest
+# EXTRA_IMAGE_FEATURES ?= "debug-tweaks"
+# #  "tools-sdk"      - add development tools (gcc, make, pkgconfig etc.)
+# #  "tools-debug"    - add debugging tools (gdb, strace)
+# #  "tools-profile"  - add profiling tools (oprofile, lttng, valgrind)
 
 # add the new layers to conf/bblayers.conf
-RUN cd /home/${USER}/rpi/build && echo -e "\
+RUN cd /home/${USER}/template/build && echo -e "\
 BBLAYERS += \" \\ \n\
-  ${YOCTO_PATH}/poky/meta-raspberrypi \\ \n\
-  ${YOCTO_PATH}/poky/meta-raspberrypi \\ \n\
-  ${YOCTO_PATH}/poky/meta-openembedded/meta-oe  \\ \n\
-  ${YOCTO_PATH}/poky/meta-openembedded/meta-networking  \\ \n\
-  ${YOCTO_PATH}/poky/meta-openembedded/meta-python  \\ \n\
+  ${YOCTO_SRC_PATH}/meta-raspberrypi \\ \n\
+  ${YOCTO_SRC_PATH}/meta-openembedded/meta-oe  \\ \n\
+  ${YOCTO_SRC_PATH}/meta-openembedded/meta-networking  \\ \n\
+  ${YOCTO_SRC_PATH}/meta-openembedded/meta-python  \\ \n\
   \"" >> conf/bblayers.conf
 RUN figlet "conf/bblayers.conf"
-RUN cd /home/${USER}/rpi/build && cat conf/bblayers.conf
+RUN cd /home/${USER}/template/build && cat conf/bblayers.conf
 
-RUN echo -e "echo -e \"Run: source ${YOCTO_PATH}/poky/oe-init-build-env\"" >> /home/${USER}/.bashrc
+# add usefull commands for the docker user
+RUN echo -e "\
+alias find_images=\"find /opt/yocto/dunfell/src/ -type f -path '*images/*' -name '*.bb'\" \n\
+echo -e \"Run: source ${YOCTO_SRC_PATH}/poky/oe-init-build-env\" \n\
+  " >> /home/${USER}/.bashrc
 
 # Make /home/build the working directory
 WORKDIR /home/${USER}

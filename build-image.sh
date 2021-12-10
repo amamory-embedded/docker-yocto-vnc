@@ -1,2 +1,3 @@
 #!/bin/bash
-docker build --rm -t yocto_vnc .
+
+docker build --rm -t yocto_vnc3 .
