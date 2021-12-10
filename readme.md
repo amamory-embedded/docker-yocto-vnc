@@ -9,9 +9,7 @@ This docker file is build on top of [docker-ubuntu-vnc-desktop](https://github.c
 ## Downloading a pre-built Docker image
 
 ```
-$ git clone https://github.com/amamory/yocto_docker_vnc
-$ cd yocto_docker
-$ ./build-image.sh
+$ docker pull amamory/docker-yocto-vnc
 ```
 
 Then you can skip the next section.

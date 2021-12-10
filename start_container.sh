@@ -39,5 +39,4 @@ echo "##########################################################"
 sleep 3
 
 # add `-u 0 ` to run as root
-#docker run -p 6080:80 -v $YOCTO_CACHE:/mnt/yocto -v $YOCTO_IMAGE:/home/build/rpi/build -v /dev/shm:/dev/shm yocto_vnc2
-docker run -u 0 -p 6080:80 --mount src="$YOCTO_CACHE",target=/mnt/yocto,type=bind --mount src="$YOCTO_IMAGE",target=/home/build/rpi,type=bind yocto_vnc3
+docker run -u 0 -p 6080:80 --mount src="$YOCTO_CACHE",target=/mnt/yocto,type=bind --mount src="$YOCTO_IMAGE",target=/home/build/rpi,type=bind amamory/docker-yocto-vnc

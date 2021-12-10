@@ -1,3 +1,3 @@
 #!/bin/bash
 
-docker build --rm -t yocto_vnc3 .
+docker build --rm -t amamory/docker-yocto-vnc .
