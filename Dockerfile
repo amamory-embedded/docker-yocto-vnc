@@ -21,7 +21,7 @@ RUN apt-get -y install locales apt-utils sudo && dpkg-reconfigure locales && loc
 ENV LANG en_US.utf8
 
 # install any other package you want in the docker image
-RUN apt-get update && apt-get -y install tree nano htop figlet geany
+RUN apt-get update && apt-get -y install tree nano htop figlet geany cmake cmake-curses-gui
 
 # Clean up APT when done.
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
