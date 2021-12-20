@@ -21,7 +21,7 @@ RUN apt-get -y install locales apt-utils sudo && dpkg-reconfigure locales && loc
 ENV LANG en_US.utf8
 
 # install any other package you want in the docker image
-RUN apt-get update && apt-get -y install tree nano htop figlet geany cmake cmake-curses-gui
+RUN apt-get update && apt-get -y install tree nano htop figlet geany autoconf cmake cmake-curses-gui
 
 # Clean up APT when done.
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
@@ -77,9 +77,7 @@ CORE_IMAGE_EXTRA_INSTALL += \"openssh\" \n\
 IMAGE_INSTALL_append += \" nano\" \n\ 
 IMAGE_INSTALL_append += \" htop\" \n\ 
 IMAGE_INSTALL_append += \" apt\" \n\ 
-PACKAGE_CLASSES = \"package_deb\" \n\ 
 PACKAGE_FEED_URIS = \"http://localhost:5678\" \n\ 
-EXTRA_IMAGE_FEATURES += \" package-management \" \n\ 
 SSTATE_DIR = \"/mnt/yocto/shared-sstate-cache\" \n\
 DL_DIR = \"/mnt/yocto/downloads\" \n\
 TMPDIR = \"/mnt/yocto/tmp\" \n\
