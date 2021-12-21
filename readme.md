@@ -58,3 +58,10 @@ $ bitbake core-image-base
 ```
 
 This environment can be easily changed to build Linux image to other Raspbery Pi models. Please check the directory `${YOCTO_SRC_PATH}/meta-raspberrypi/conf/machine` for the supported RPi models.
+
+## Others
+
+Similar initiatives:
+
+ - https://github.com/kylefoxaustin/ubuntu_vnc_lxde_yocto
+
