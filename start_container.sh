@@ -34,9 +34,10 @@ if [[ $FREE -lt 52428800 ]]; then               # 50G = 50*1024*1024k
 fi;
 
 echo "##########################################################"
-echo "run on another terminal : $ firefox http://localhost:6080/"
+echo "VNC : $ firefox http://localhost:6080/"
+echo "package repository : $ firefox http://localhost:8000/"
 echo "##########################################################"
 sleep 3
 
 # add `-u 0 ` to run as root
-docker run -u 0 -p 6080:80 --mount src="$YOCTO_CACHE",target=/mnt/yocto,type=bind --mount src="$YOCTO_IMAGE",target=/home/build/rpi,type=bind amamory/docker-yocto-vnc
+docker run -u 0 -p 6080:80 -p 8000:8000 --mount src="$YOCTO_CACHE",target=/mnt/yocto,type=bind --mount src="$YOCTO_IMAGE",target=/home/build/rpi,type=bind amamory/docker-yocto-vnc
