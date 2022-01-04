@@ -96,6 +96,10 @@ $ dnf install <package-name>
 ```
 DNF is now able to find, install, and upgrade packages from the specified repository or repositories.
 
+## TODO
+
+ - [x] Include [package repository webserver](https://community.nxp.com/t5/i-MX-Processors-Knowledge-Base/Setting-up-a-package-management-service-in-Yocto-for-your-image/ta-p/1108179) or like [this](https://github.com/VSChina/yocto-101/blob/master/configure_package_manager.md). Feature under test...
+
 ## Others
 
 Similar initiatives:
