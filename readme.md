@@ -2,7 +2,7 @@
 
 [![Docker Hub](https://img.shields.io/docker/pulls/amamory/docker-yocto-vnc.svg?style=flat-square)](https://hub.docker.com/r/amamory/docker-yocto-vnc/)
 
-Docker image for Yocto 3.1 (Dunfell) based on Ubuntu 18.04 (bionic) with support to VNC. It also includes the layers to build Linux for Raspberry Pi 3.
+Docker image for Yocto 3.1 (Dunfell) based on Ubuntu 18.04 (bionic) with support to VNC and package repository webserver. It also includes the layers to build Linux for Raspberry Pi 3.
 
 This docker file is build on top of [docker-ubuntu-vnc-desktop](https://github.com/fcwu/docker-ubuntu-vnc-desktop) which provides pre-built docker with VNC support. This Dockerfile uses `dorowu/ubuntu-desktop-lxde-vnc:bionic-lxqt`.
 
@@ -54,7 +54,6 @@ One usual Yocto images is `core-image-base`.
 
 ```
 $ bitbake core-image-base
-
 ```
 
 This environment can be easily changed to build Linux image to other Raspbery Pi models. Please check the directory `${YOCTO_SRC_PATH}/meta-raspberrypi/conf/machine` for the supported RPi models.
