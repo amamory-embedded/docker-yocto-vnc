@@ -22,7 +22,7 @@ $ cd yocto_docker
 $ ./build-image.sh
 ```
 
-## Starting the container
+## Starting the container with VNC
 
 When running the image, the user has to pass a directory where the yocto cache and the resulting image will be saved in the host computer. This way, it is possible to do an incremental design, running the image multiple time without starting over again.
 
@@ -57,6 +57,21 @@ $ bitbake core-image-base
 ```
 
 This environment can be easily changed to build Linux image to other Raspbery Pi models. Please check the directory `${YOCTO_SRC_PATH}/meta-raspberrypi/conf/machine` for the supported RPi models.
+
+
+## Starting the container with Terminal
+
+Running VNC can sometimes be a too slow. In this case, we can attach multiple terminals to the docker container already running. Run the following steps:
+
+```bash
+$ docker ps
+deadbeef   amamory/docker-yocto-vnc ...
+$ docker exec -it deadbeef bash
+```
+
+In this example `deadbeef` is the hexa string referent to the container ID. The first command shoes the ID we use in the second command. Note that you can repeat the last command as much as you like to open multiple terminals attached to the same container.
+
+Before starting to te yocto hacking, remember to change to the docker user, with the command `su build`.
 
 ## Package repositories
 
