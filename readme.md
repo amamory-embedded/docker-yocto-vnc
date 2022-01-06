@@ -66,7 +66,7 @@ Running VNC can sometimes be a too slow. In this case, we can attach multiple te
 ```bash
 $ docker ps
 deadbeef   amamory/docker-yocto-vnc ...
-$ docker exec -it deadbeef bash
+$ docker exec -u build -it deadbeef bash
 ```
 
 In this example `deadbeef` is the hexa string referent to the container ID. The first command shoes the ID we use in the second command. Note that you can repeat the last command as much as you like to open multiple terminals attached to the same container.
